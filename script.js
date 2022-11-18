@@ -8,22 +8,22 @@ const gameBoard = (() => {
         } else return false;
     }
     const resetBoard = () => {
-        for(let i = 0; i < cellArray.length; i++) {
+        for (let i = 0; i < cellArray.length; i++) {
             cellArray[i] = null;
         }
-        displayController.updateGameBoard();
     }
 
-    return {getCellContent, markCell, checkIfEmpty, resetBoard };
+    return { getCellContent, markCell, checkIfEmpty, resetBoard };
 })();
 
-const Player = (symbol) => {
+const Player = (name, symbol) => {
     let score = 0;
+    const getName = () => { return name }
     const getScore = () => { return score }
-    const setScore = (points) => { score += points }
+    const addScore = () => { score += 1 }
     const getSymbol = () => { return symbol }
 
-    return { getScore, setScore, getSymbol };
+    return { getName, getScore, addScore, getSymbol};
 }
 
 const displayController = (() => {
@@ -36,17 +36,31 @@ const displayController = (() => {
 
     cells.forEach((cell, cellIndex) => {
         cell.addEventListener('click', () => {
-            gameController.play(cellIndex);
+            if(gameController.getGameState()) {
+                gameController.play(cellIndex);
+            }
         });
     })
 
-    return {updateGameBoard}
+    return { updateGameBoard }
 })();
 
 const gameController = (() => {
-    let player1 = Player('O');
-    let player2 = Player('X');
+    let player1 = Player('P1', 'O');
+    let player2 = Player('P2', 'X');
     let turnOwner = player1;
+    let gameState = true;
+    const winConditions = [
+        [0, 1, 2],
+        [0, 3, 6],
+        [0, 4, 8],
+        [3, 4, 5],
+        [1, 4, 7],
+        [6, 7, 8],
+        [2, 5, 8],
+        [2, 4, 6]
+    ];
+
     const getTurnOwner = () => { return turnOwner }
     const switchTurn = () => {
         if (turnOwner == player1) {
@@ -54,13 +68,49 @@ const gameController = (() => {
         } else turnOwner = player1;
     }
 
+    const getGameState = () => {return gameState}
+
     const play = (cellIndex) => {
         if (gameBoard.checkIfEmpty(cellIndex)) {
             gameBoard.markCell(getTurnOwner().getSymbol(), cellIndex);
             displayController.updateGameBoard()
+            checkForTriplets(getTurnOwner());
             switchTurn();
         }
     }
 
-    return {play}
+    const checkForTriplets = (player) => {
+        playerSymbol = player.getSymbol();
+        winConditions.forEach(condition => {
+            let matchCount = 0;
+            for (let i = 0; i <= 2; i++) {
+                if (gameBoard.getCellContent(condition[i]) == playerSymbol) {
+                    matchCount++;
+                }
+            }
+            if (matchCount == 3) {
+                setWinner(player);
+
+            }
+        })
+        return false;
+    }
+
+    const resetRound = () => {
+        gameBoard.resetBoard();
+        displayController.updateGameBoard()
+        turnOwner = player1;
+        gameState = true;
+    }
+
+    const setWinner = (player) => {
+        gameState = false;
+        player.addScore();
+        console.log(`Round over. The winner is ${player.getName()}. ${player.getName()}'s score: ${player.getScore()}`);
+        setTimeout(() => {
+            resetRound();
+        }, 3000);
+    }
+
+    return { play , getGameState }
 })();
