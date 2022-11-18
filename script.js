@@ -46,11 +46,10 @@ const displayController = (() => {
 })();
 
 const gameController = (() => {
-    let player1 = Player('P1', 'O');
-    let player2 = Player('P2', 'X');
+    let player1 = Player('Player O', 'O');
+    let player2 = Player('Player X', 'X');
     let turnOwner = player1;
     let gameState = true;
-    let round = 1;
     const winConditions = [
         [0, 1, 2],
         [0, 3, 6],
@@ -62,18 +61,7 @@ const gameController = (() => {
         [2, 4, 6]
     ];
 
-    const handleTie = () => {
-        console.log(`It's a tie!`);
-        setTimeout(() => {
-            resetRound();
-        }, 3000);
-    }
     const getTurnOwner = () => { return turnOwner }
-    const switchTurn = () => {
-        if (turnOwner == player1) {
-            turnOwner = player2;
-        } else turnOwner = player1;
-    }
 
     const getGameState = () => {return gameState}
 
@@ -121,6 +109,19 @@ const gameController = (() => {
         }
     }
 
+    const handleTie = () => {
+        console.log(`It's a tie!`);
+        setTimeout(() => {
+            resetRound();
+        }, 3000);
+    }
+
+    const switchTurn = () => {
+        if (turnOwner == player1) {
+            turnOwner = player2;
+        } else turnOwner = player1;
+    }
+
     const resetRound = () => {
         console.clear();
         round = 1;
@@ -139,5 +140,5 @@ const gameController = (() => {
         }, 3000);
     }
 
-    return { play , getGameState, checkForTriplets, getTurnOwner}
+    return { play , getGameState }
 })();
