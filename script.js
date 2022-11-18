@@ -50,6 +50,7 @@ const gameController = (() => {
     let player2 = Player('P2', 'X');
     let turnOwner = player1;
     let gameState = true;
+    let round = 1;
     const winConditions = [
         [0, 1, 2],
         [0, 3, 6],
@@ -61,6 +62,12 @@ const gameController = (() => {
         [2, 4, 6]
     ];
 
+    const handleTie = () => {
+        console.log(`It's a tie!`);
+        setTimeout(() => {
+            resetRound();
+        }, 3000);
+    }
     const getTurnOwner = () => { return turnOwner }
     const switchTurn = () => {
         if (turnOwner == player1) {
@@ -74,13 +81,20 @@ const gameController = (() => {
         if (gameBoard.checkIfEmpty(cellIndex)) {
             gameBoard.markCell(getTurnOwner().getSymbol(), cellIndex);
             displayController.updateGameBoard()
-            checkForTriplets(getTurnOwner());
+            checkBoard();
             switchTurn();
         }
     }
 
+    const checkBoard = () => {
+        if(checkForTriplets(getTurnOwner())) {
+            setWinner(getTurnOwner());
+        } else checkForTie();
+    }
+
     const checkForTriplets = (player) => {
         playerSymbol = player.getSymbol();
+        let found = false;
         winConditions.forEach(condition => {
             let matchCount = 0;
             for (let i = 0; i <= 2; i++) {
@@ -89,14 +103,27 @@ const gameController = (() => {
                 }
             }
             if (matchCount == 3) {
-                setWinner(player);
-
+                found = true;
             }
         })
-        return false;
+        return found;
+    }
+
+    const checkForTie = () => {
+        let nulls = 0;
+        for(let i = 0; i <= 8; i++) {
+            if(gameBoard.getCellContent(i) == null) {
+                nulls++;
+            }
+        }
+        if(nulls == 0) {
+            handleTie();
+        }
     }
 
     const resetRound = () => {
+        console.clear();
+        round = 1;
         gameBoard.resetBoard();
         displayController.updateGameBoard()
         turnOwner = player1;
@@ -112,5 +139,5 @@ const gameController = (() => {
         }, 3000);
     }
 
-    return { play , getGameState }
+    return { play , getGameState, checkForTriplets, getTurnOwner}
 })();
