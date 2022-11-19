@@ -30,7 +30,7 @@ const displayController = (() => {
     let cells = document.querySelectorAll('.cell');
     const updateGameBoard = () => {
         cells.forEach((cell, cellIndex) => {
-            cell.textContent = gameBoard.getCellContent(cellIndex);
+            cell.querySelector('.cell-text').textContent = gameBoard.getCellContent(cellIndex);
         })
     }
 
@@ -46,8 +46,8 @@ const displayController = (() => {
 })();
 
 const gameController = (() => {
-    let player1 = Player('Player O', 'O');
-    let player2 = Player('Player X', 'X');
+    let player1 = Player('Player O', '🐶');
+    let player2 = Player('Player X', '🐱');
     let turnOwner = player1;
     let gameState = true;
     const winConditions = [
@@ -139,6 +139,7 @@ const gameController = (() => {
             resetRound();
         }, 3000);
     }
+
 
     return { play , getGameState }
 })();
